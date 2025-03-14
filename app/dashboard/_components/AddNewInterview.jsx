@@ -20,16 +20,16 @@ import { useRouter } from "next/navigation"
 const AddNewInterview = () => {
     const [openDialog, setOpenDialog] = useState(false)
 
-    const [jobPosition, setJobPosition] = useState()
-    const [jobDesc, setJobDesc] = useState()
-    const [jobExperience, setJobExperience] = useState()
+    const [jobPosition, setJobPosition] = useState("");
+    const [jobDesc, setJobDesc] = useState("");
+    const [jobExperience, setJobExperience] = useState("");
 
     const [loading, setLoading] = useState(false)
 
-    const[jsonResponse,setJsonResponse]=useState([])
-    const router=useRouter()
-    
-    const {user}=useUser()
+    const [jsonResponse, setJsonResponse] = useState([])
+    const router = useRouter()
+
+    const { user } = useUser()
 
     const onSubmit = async (e) => {
         setLoading(true)
@@ -39,32 +39,37 @@ const AddNewInterview = () => {
         const InputPrompt = `Job Position: ${jobPosition}, Job Description: ${jobDesc}, Job Experience: ${jobExperience}. Based on this, provide 10 interview questions along with answers in JSON format.`;
 
         try {
-            const result = await chatSession.sendMessage(InputPrompt); // Await the response
-            const MockJsonResp = (result.response.text()).replace('```json', '').replace('```', '')
+            const result = await chatSession.sendMessage(InputPrompt);
+            const textResponse = await result.response.text();
+            const MockJsonResp = textResponse.replace('```json', '').replace('```', '');
 
-            setJsonResponse(MockJsonResp)
+            setJsonResponse(JSON.parse(MockJsonResp));
 
-            const mockInterviewData={
-                jsonMockResp:MockJsonResp,
-                jobPosition:jobPosition,
-                jobDesc:jobDesc,
-                jobExperience:jobExperience,
-                createdBy:user.id,
+
+            const mockInterviewData = {
+                jsonMockResp: MockJsonResp,
+                jobPosition: jobPosition,
+                jobDesc: jobDesc,
+                jobExperience: jobExperience,
+                createdBy: user.id,
             }
 
-            const response=await fetch("/api/saveInterview",{
-                method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body:JSON.stringify(mockInterviewData),
+            const response = await fetch("/api/saveInterview", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(mockInterviewData),
             })
 
-            const data=await response.json();
-            console.log("Saved to MongoDB:",data);
+            const data = await response.json();
+            console.log("Saved to MongoDB:", data);
 
-            if (response.ok) {
-                setOpenDialog(false); // Close modal only on success
-                router.push('/dashboard/interview/'+ data.data.mockId); 
+            if (response.ok && data?.data?.mockId) {
+                setOpenDialog(false);
+                router.push(`/dashboard/interview/${data.data.mockId}`);
+            } else {
+                console.error("Error: mockId not found in response");
             }
+            
 
         } catch (error) {
             console.error("Error fetching interview questions:", error);

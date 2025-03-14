@@ -8,10 +8,10 @@ import { usePathname } from 'next/navigation'
 const Header = () => {
 
     const path=usePathname();
-    useEffect(()=>{
-        console.log(path);
+    // useEffect(()=>{
+    //     console.log(path);
         
-    })
+    // })
 
   return (
     <div className='flex p-4 item-center justify-between bg-secondary shadow-md'>

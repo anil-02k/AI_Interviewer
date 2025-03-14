@@ -13,8 +13,7 @@ const Interview = () => {
 
   useEffect(() => {
     if (params?.interviewId) {
-      console.log("Interview ID:", params.interviewId);
-      fetchInterviewDetails();
+       fetchInterviewDetails();
     }
   }, [params.interviewId]); // Add params.interviewId as a dependency
 
@@ -22,7 +21,6 @@ const Interview = () => {
     try {
       const response = await fetch(`/api/getInterview?interviewId=${params.interviewId}`);
       const data = await response.json();
-      console.log(data);  // Check the structure of the response here
       setInterviewData(data);
     } catch (e) {
       console.error("Error fetching interview details:", e);
