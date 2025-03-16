@@ -10,6 +10,7 @@ const Interview = () => {
   const params = useParams();
   const [interviewData, setInterviewData] = useState(null);
   const [webcam, setWebcam] = useState(false);
+  const [interviewStarted, setInterviewStarted] = useState(false);
 
   useEffect(() => {
     if (params?.interviewId) {
@@ -25,6 +26,11 @@ const Interview = () => {
     } catch (e) {
       console.error("Error fetching interview details:", e);
     }
+  };
+
+  const startInterview = () => {
+    setInterviewStarted(true);
+    // Add your interview start logic here
   };
 
   // Custom Card components
@@ -112,7 +118,7 @@ const Interview = () => {
           <Card className="w-full h-full">
             <CardContent className="p-6">
               {webcam ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden border">
                     <Webcam
                       mirrored={true}
@@ -123,16 +129,27 @@ const Interview = () => {
                       }}
                     />
                   </div>
-                  <p className="text-center text-sm text-green-600 font-medium">
-                    Webcam enabled - You're ready to start!
-                  </p>
+                  <div className="text-center space-y-4">
+                    <p className="text-sm text-green-600 font-medium">
+                      Webcam enabled - You're ready to start!
+                    </p>
+                    {!interviewStarted && (
+                      <Button
+                        onClick={startInterview}
+                        size="lg"
+                        className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg"
+                      >
+                        Start Interview Now
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full min-h-[400px] space-y-6">
                   <div className="bg-gray-100 p-8 rounded-full">
                     <WebcamIcon className="w-16 h-16 text-gray-400" />
                   </div>
-                  <Button 
+                  <Button
                     onClick={() => setWebcam(true)}
                     size="lg"
                     className="gap-2 py-5 px-8"
